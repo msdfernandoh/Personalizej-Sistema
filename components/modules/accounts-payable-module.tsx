@@ -172,7 +172,7 @@ export function AccountsPayableModule() {
               <Button variant="outline" onClick={() => { setEditingBank(null); setNewBank({ name: "", code: "" }); }}>
                 Cancelar
               </Button>
-            }
+            )}
           </div>
           {banks.length > 0 && (
             <div className="border rounded-lg overflow-hidden">
