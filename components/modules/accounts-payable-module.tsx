@@ -33,7 +33,14 @@ export function AccountsPayableModule() {
   })
   const [showBanks, setShowBanks] = useState(false)
   const [editingBank, setEditingBank] = useState<string | null>(null)
-  const [newBank, setNewBank] = useState({ name: "", code: "" })
+  const [newBank, setNewBank] = useState({
+    name: "",
+    code: "",
+    titular: "",
+    agencia: "",
+    conta: "",
+    pix: "",
+  })
 
   const handleAddAccount = () => {
     if (newAccount.description && newAccount.amount > 0 && newAccount.dueDate) {
@@ -82,26 +89,41 @@ export function AccountsPayableModule() {
 
   const handleAddBank = () => {
     if (newBank.name.trim()) {
+      const data = {
+        name: newBank.name.trim(),
+        code: newBank.code.trim() || undefined,
+        titular: newBank.titular.trim() || undefined,
+        agencia: newBank.agencia.trim() || undefined,
+        conta: newBank.conta.trim() || undefined,
+        pix: newBank.pix.trim() || undefined,
+      }
       if (editingBank) {
-        updateBank(editingBank, { name: newBank.name.trim(), code: newBank.code.trim() || undefined })
+        updateBank(editingBank, data)
         setEditingBank(null)
       } else {
-        addBank({ name: newBank.name.trim(), code: newBank.code.trim() || undefined })
+        addBank(data)
       }
-      setNewBank({ name: "", code: "" })
+      setNewBank({ name: "", code: "", titular: "", agencia: "", conta: "", pix: "" })
     }
   }
 
-  const handleEditBank = (bank: { id: string; name: string; code?: string }) => {
+  const handleEditBank = (bank: { id: string; name: string; code?: string; titular?: string; agencia?: string; conta?: string; pix?: string }) => {
     setEditingBank(bank.id)
-    setNewBank({ name: bank.name, code: bank.code ?? "" })
+    setNewBank({
+      name: bank.name,
+      code: bank.code ?? "",
+      titular: bank.titular ?? "",
+      agencia: bank.agencia ?? "",
+      conta: bank.conta ?? "",
+      pix: bank.pix ?? "",
+    })
   }
 
   const handleDeleteBank = (id: string) => {
     deleteBank(id)
     if (editingBank === id) {
       setEditingBank(null)
-      setNewBank({ name: "", code: "" })
+      setNewBank({ name: "", code: "", titular: "", agencia: "", conta: "", pix: "" })
     }
   }
 
@@ -148,39 +170,83 @@ export function AccountsPayableModule() {
           <p className="text-sm text-muted-foreground">
             Cadastre os bancos para associar às contas a pagar (ex.: banco de onde será feito o pagamento).
           </p>
-          <div className="flex gap-2 flex-wrap items-end">
-            <div>
-              <label className="block text-sm font-medium mb-1">Nome do banco</label>
-              <input
-                placeholder="Ex: Banco do Brasil"
-                value={newBank.name}
-                onChange={(e) => setNewBank({ ...newBank, name: e.target.value })}
-                className="w-48 px-3 py-2 border rounded-lg"
-              />
+          <div className="space-y-4">
+            <div className="flex gap-2 flex-wrap items-end">
+              <div>
+                <label className="block text-sm font-medium mb-1">Nome do banco</label>
+                <input
+                  placeholder="Ex: Banco do Brasil"
+                  value={newBank.name}
+                  onChange={(e) => setNewBank({ ...newBank, name: e.target.value })}
+                  className="w-48 px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Código (opcional)</label>
+                <input
+                  placeholder="Ex: 001"
+                  value={newBank.code}
+                  onChange={(e) => setNewBank({ ...newBank, code: e.target.value })}
+                  className="w-24 px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Titular</label>
+                <input
+                  placeholder="Nome do titular"
+                  value={newBank.titular}
+                  onChange={(e) => setNewBank({ ...newBank, titular: e.target.value })}
+                  className="w-48 px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Agência</label>
+                <input
+                  placeholder="Ex: 1234"
+                  value={newBank.agencia}
+                  onChange={(e) => setNewBank({ ...newBank, agencia: e.target.value })}
+                  className="w-24 px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Conta</label>
+                <input
+                  placeholder="Ex: 12345-6"
+                  value={newBank.conta}
+                  onChange={(e) => setNewBank({ ...newBank, conta: e.target.value })}
+                  className="w-28 px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">PIX</label>
+                <input
+                  placeholder="Chave PIX (CPF, e-mail, etc.)"
+                  value={newBank.pix}
+                  onChange={(e) => setNewBank({ ...newBank, pix: e.target.value })}
+                  className="w-52 px-3 py-2 border rounded-lg"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Código (opcional)</label>
-              <input
-                placeholder="Ex: 001"
-                value={newBank.code}
-                onChange={(e) => setNewBank({ ...newBank, code: e.target.value })}
-                className="w-24 px-3 py-2 border rounded-lg"
-              />
+            <div className="flex gap-2">
+              <Button onClick={handleAddBank}>{editingBank ? "Atualizar" : "Adicionar"} Banco</Button>
+              {editingBank && (
+                <Button variant="outline" onClick={() => { setEditingBank(null); setNewBank({ name: "", code: "", titular: "", agencia: "", conta: "", pix: "" }); }}>
+                  Cancelar
+                </Button>
+              )}
             </div>
-            <Button onClick={handleAddBank}>{editingBank ? "Atualizar" : "Adicionar"} Banco</Button>
-            {editingBank && (
-              <Button variant="outline" onClick={() => { setEditingBank(null); setNewBank({ name: "", code: "" }); }}>
-                Cancelar
-              </Button>
-            )}
           </div>
           {banks.length > 0 && (
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="border rounded-lg overflow-x-auto">
+              <table className="w-full text-sm min-w-[640px]">
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="px-4 py-2 text-left font-medium">Nome</th>
                     <th className="px-4 py-2 text-left font-medium">Código</th>
+                    <th className="px-4 py-2 text-left font-medium">Titular</th>
+                    <th className="px-4 py-2 text-left font-medium">Agência</th>
+                    <th className="px-4 py-2 text-left font-medium">Conta</th>
+                    <th className="px-4 py-2 text-left font-medium">PIX</th>
                     <th className="px-4 py-2 text-right font-medium">Ações</th>
                   </tr>
                 </thead>
@@ -189,7 +255,11 @@ export function AccountsPayableModule() {
                     <tr key={b.id} className="border-b hover:bg-muted/30">
                       <td className="px-4 py-2">{b.name}</td>
                       <td className="px-4 py-2">{b.code ?? "—"}</td>
-                      <td className="px-4 py-2 text-right">
+                      <td className="px-4 py-2">{b.titular ?? "—"}</td>
+                      <td className="px-4 py-2">{b.agencia ?? "—"}</td>
+                      <td className="px-4 py-2">{b.conta ?? "—"}</td>
+                      <td className="px-4 py-2">{b.pix ?? "—"}</td>
+                      <td className="px-4 py-2 text-right whitespace-nowrap">
                         <Button variant="ghost" size="sm" onClick={() => handleEditBank(b)}>
                           <Edit2 className="w-4 h-4" />
                         </Button>

@@ -191,6 +191,10 @@ export interface Bank {
   id: string
   name: string
   code?: string // Código do banco (ex: 001, 341)
+  titular?: string
+  agencia?: string
+  conta?: string
+  pix?: string
   createdAt: Date
 }
 
